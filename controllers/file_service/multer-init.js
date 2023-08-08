@@ -1,6 +1,6 @@
 import Multer from "multer"  
 import FirebaseStorage from "multer-firebase-storage";
-import firebaseObj from "./firebase_init.js";
+import firebaseObj from "./firebase-init.js";
 import "dotenv/config";
 
 const multerObj = Multer({
