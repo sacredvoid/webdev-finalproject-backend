@@ -43,6 +43,6 @@ async function getJSON(url) {
 export default getLatLon
 
 // testing
-getLatLon("123 street st", "boston", "ma")
+// getLatLon("123 street st", "boston", "ma")
 // getLatLon("2207 Lou Neff Rd", "Austin", "TX")
 // getLatLon("denver", "co")
