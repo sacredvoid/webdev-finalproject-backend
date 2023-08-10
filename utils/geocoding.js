@@ -5,8 +5,10 @@ street (string) = address street number and name, default: empty string
 city (string) = address city, default: empty string
 state (string) = address state, default: empty string
 country (string) = address country, default: empty string
+Return:
+coords (array of strings) = latitude and longitude
 */
-async function Geocoding(street='', city='', state='', country='') {
+async function getLatLon(street='', city='', state='', country='') {
     // format params: + sign separated, no whitespace
     const searchParams = `${street}+${city}+${state}+${country}`.replace(/ /g, '+');
     // nominatim api url with search params
@@ -29,6 +31,8 @@ async function Geocoding(street='', city='', state='', country='') {
 Function to retrieve json from api call to given url
 Params:
 url (string) = url to retrieve json from
+Return:
+results (json) = api fetch results in json format
 */
 async function getJSON(url) {
     const response = await fetch(url);
@@ -36,9 +40,9 @@ async function getJSON(url) {
     return results;
 }
 
-export default Geocoding
+export default getLatLon
 
 // testing
-// Geocoding("123 street st", "boston", "ma")
-// Geocoding("2207 Lou Neff Rd", "Austin", "TX")
-// Geocoding("denver", "co")
+getLatLon("123 street st", "boston", "ma")
+// getLatLon("2207 Lou Neff Rd", "Austin", "TX")
+// getLatLon("denver", "co")
