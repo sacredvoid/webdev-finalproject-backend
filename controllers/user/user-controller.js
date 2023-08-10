@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createRegular ,createAdmin, createGuest, createOrganizaitonUser, findAllUsers, findUsersByType, findUserByUsername, findUserByCredentials, findUsersByOrgDetails, deleteUser, findUserById, updateUser} from "../mongo_db/daos/users-dao.js";
+import { createRegular ,createAdmin, createGuest, createOrganizaitonUser, findAllUsers, findUsersByType, findUserByUsername, findUserByCredentials, findUsersByOrgDetails, deleteUser, findUserById, updateUser} from "../../mongo_db/daos/users-dao.js";
 
 const userController = Router();
 
