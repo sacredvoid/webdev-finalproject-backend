@@ -4,7 +4,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import connectDB from './mongo_db/conn.js';
 import mongoose from 'mongoose';
-import userController from './users/user-controller.js';
+import userController from './controllers/user/user-controller.js';
 
 
 const PORT = 4000
