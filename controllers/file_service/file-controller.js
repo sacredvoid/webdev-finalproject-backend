@@ -11,7 +11,6 @@ export default (app) => {
 
 const uploadFile = (req, res) => {
     res.status(201).json(req.file.publicUrl);
-
 }
 
 function extractFileName(link) {

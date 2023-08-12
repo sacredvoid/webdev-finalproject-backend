@@ -28,6 +28,11 @@ const eventSchema = new mongoose.Schema({
         required: false,
         default: ''
     },
+    published: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     reservation: {
         type: Boolean,
         required: false,
