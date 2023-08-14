@@ -1,16 +1,25 @@
 import multerObj from "./multer-init.js";
 import { getStorage } from "firebase-admin/storage"
 
-
+const uploadSingle = multerObj.single('file');
+const uploadMultiple = multerObj.array('file');
 const folderName = 'mapverse_images/';
 export default (app) => {
-    app.post('/api/files/upload', multerObj.single('file'), uploadFile);
-    app.post('/api/files/multipleupload', multerObj.array())
-    app.post('/api/files/delete', deleteFile);
+    app.post('/api/files/upload', uploadSingle, uploadFile);
+    app.post('/api/files/delete', deleteFile)
+    app.post('/api/files/multi-upload', uploadMultiple, uploadMultipleF);
 }
-
 const uploadFile = (req, res) => {
-    res.status(201).json(req.file.publicUrl);
+    try {
+        if(!req.file) {
+            return res.status(400).json({error:'File upload failed'});
+        }
+        else {
+            return res.status(200).json({public_url: req.file.publicUrl});
+        }
+    } catch (error) {
+        return res.status(500).message('File upload failed due to:',error.message);
+    }
 }
 
 function extractFileName(link) {
@@ -33,4 +42,22 @@ const deleteFile = (req, res) => {
            console.error(`Failed to delete file`, err);
            res.sendStatus(404);
         });
+}
+
+const uploadMultipleF = (req, res) => {
+    try {
+        if(!req.files || req.files.length === 0) {
+            return res.status(400).json({error:'File upload failed'});
+        }
+        else {
+            let urls = req.files.map(file => {
+                return file.publicUrl;
+            });
+
+            return res.status(200).json({public_url: urls});
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({"File upload": error.message});
+    }
 }
