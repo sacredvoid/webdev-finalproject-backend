@@ -13,7 +13,7 @@ async function getLatLon(street='', city='', state='', country='') {
     const searchParams = `${street}+${city}+${state}+${country}`.replace(/ /g, '+');
     // nominatim api url with search params
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchParams}`;
-    console.log(url);
+    // console.log(url);
     // retrieve json results from url
     const results = await getJSON(url);
     // take first item in json, which is the top result; assumes that the top result in the right one
@@ -23,7 +23,7 @@ async function getLatLon(street='', city='', state='', country='') {
     const lon = topRes.lon;
     // format lat and lon as list and return
     const coords = [lat, lon];
-    console.log(coords)
+    // console.log(coords)
     return coords;
 }
 

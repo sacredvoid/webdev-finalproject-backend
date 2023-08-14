@@ -3,7 +3,7 @@ import { createEvent } from "../../mongo_db/daos/events-dao.js";
 import getLatLon from "../../utils/geocoding.js";
 
 const eventsController = Router();
-import eventFormReq from "./events-req.json"
+import eventFormReq from "./events-req.json" assert { type: "json" };
 
 function mapReqToSchema(request) {
     eventFormReq.address = request.address;
@@ -20,24 +20,28 @@ function mapReqToSchema(request) {
     return eventFormReq;
 }
 
-eventsController.post('/api/events', async(req, res) => {
+eventsController.post('/events', async(req, res) => {
     const eventFormDetails = req.body;
     // Call external api here for co-ordinates
-    const address = eventFormDetails.address
+    let address = eventFormDetails.address
     if (address!='') {
-        const address = address.split(',');
-        const coords = getLatLon(address[0],address[1],address[2]);
+        let addressSplit = address.split(',');
+        const coords = await getLatLon(addressSplit[0],addressSplit[1],addressSplit[2]);
+        // console.log("coords: ", coords);
         eventFormDetails.coordinates = coords;
     }
     
     // Update incoming request and send to DB for saving
-    updatedEventFormDetails = mapReqToSchema(eventFormDetails)
-
+    const updatedEventFormDetails = mapReqToSchema(eventFormDetails)
+    console.log(updatedEventFormDetails);
     let eventCreated = null;
     try {
         eventCreated = await createEvent(updatedEventFormDetails);
+        res.status(201).json(eventCreated);
     } catch (error) {
         console.log(error);
-        res.statusCode(400).json({message: error.message});
+        res.status(400).json({message: error.message});
     }
 })
+
+export default eventsController;

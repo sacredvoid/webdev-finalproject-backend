@@ -1,6 +1,6 @@
 import { Decimal128 } from "mongodb";
 import mongoose from "mongoose";
-const eventSchema = new mongoose.Schema({
+export const eventSchema = new mongoose.Schema({
     eventName: {
         type: String,
         required: true,
@@ -53,8 +53,4 @@ const eventSchema = new mongoose.Schema({
         required: false,
         default: []
     }
-}, "events")
-
-const eventModel = mongoose.model('Event', eventSchema)
-
-export default eventModel
+}, {collection: "events"})
