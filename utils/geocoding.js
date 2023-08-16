@@ -10,7 +10,15 @@ coords (array of strings) = latitude and longitude
 */
 async function getLatLon(street='', city='', state='', country='') {
     // format params: + sign separated, no whitespace
-    const searchParams = `${street}+${city}+${state}+${country}`.replace(/ /g, '+');
+    const parts = [];
+
+    if (street) parts.push(street);
+    if (city) parts.push(city);
+    if (state) parts.push(state);
+    if (country) parts.push(country);
+
+    const searchParams = parts.join('+').replace(/ /g, '+');
+    console.log("search params: ", searchParams);
     // nominatim api url with search params
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchParams}`;
     // console.log(url);

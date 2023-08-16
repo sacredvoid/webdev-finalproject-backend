@@ -5,4 +5,3 @@ export const BaseUserSchema =  new Schema({
     lastname:{type:String, required:true},
     privileges:{type:Array, default:['view']},
 },{discriminatorKey:"user_type",collection:"users"})
-

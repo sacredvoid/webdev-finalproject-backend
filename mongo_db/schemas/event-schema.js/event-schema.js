@@ -1,5 +1,44 @@
 import { Decimal128 } from "mongodb";
 import mongoose from "mongoose";
+
+const HostnameSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+  });
+
+const AddressSchema = new mongoose.Schema({
+    venueName: {
+        type: String,
+        required: true
+    },
+    street: {
+        type: String,
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
+    state: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    zipcode: {
+        type: String,
+        required: true
+    }
+})
+
 export const eventSchema = new mongoose.Schema({
     eventName: {
         type: String,
@@ -14,10 +53,7 @@ export const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    address: {
-        type: String,
-        required: true
-    },
+    address: AddressSchema,
     coordinates: {
         type: [Decimal128],
         required: true,
@@ -52,5 +88,20 @@ export const eventSchema = new mongoose.Schema({
         type: [String],
         required: false,
         default: []
-    }
+    },
+    hostDetails: HostnameSchema
 }, {collection: "events"})
+
+eventSchema.index(
+    {
+      eventName: 'text',
+      description: 'text',
+      tags: 'text',
+      'address.venueName': 'text',
+      'address.street': 'text',
+      'address.city': 'text',
+      'address.state': 'text',
+      'address.country': 'text',
+      'address.zipcode': 'text'
+    }
+  );
