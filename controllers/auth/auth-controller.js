@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { findUserByCredentials } from "../../mongo_db/daos/users-dao.js";
+import { createOrganizaitonUser, createRegular, findUserByCredentials, findUserByUsername } from "../../mongo_db/daos/users-dao.js";
 
 const authController = Router();
 
@@ -17,5 +17,33 @@ authController.post('/login', async(req,res)=>{
     }
 });
 
+authController.post('/register', async(req,res) => {
+    console.log('in authcontroller')
+    console.log(req.body)
+    const formType = req.body.form_type;
+    const formData = req.body.formData;
+    const username = formData.username;
+    let newUser = null;
+    const user = await findUserByUsername(username);
+    try{
+        if(user){
+            res.sendStatus(403);
+            return;
+        }
+        if(formType === "reg-user"){
+            newUser = await createRegular(formData);
+        }
+        else if (formType === "org-user"){
+            newUser = await createOrganizaitonUser(formData)
+        }
+        req.session["currentUser"] = newUser;
+        res.json(newUser);
+        
+    }catch(error){
+        res.status(500).json(error)
+    }
+    
+
+})
 
 export default authController;
