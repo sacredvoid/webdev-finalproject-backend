@@ -1,0 +1,14 @@
+{
+    "eventName": "test",
+    "startDate": "2022-10-10",
+    "endDate": "2022-10-11",
+    "address": {},
+    "coordinates": [0,0],
+    "description": "",
+    "reservation": true,
+    "published": true,
+    "maxReservation": 10,
+    "tags": ["amc", "boston"],
+    "imgs": ["http", "https"],
+    "hostDetails": {}
+}
