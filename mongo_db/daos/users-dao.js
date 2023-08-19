@@ -55,8 +55,8 @@ export const findUserByUsername = (username) => {
 
 //find user by credentials
 
-export const findUserByCredentials = (username, password) =>{
-    return BaseUserModel.findOne({"username": username,"password": password})
+export const findUserByCredentials = async (username, password) =>{
+    return await BaseUserModel.findOne({"username": username,"password": password})
 }
 
 
