@@ -69,4 +69,17 @@ export const getEventsCustomSearch = (queryObject) => {
     return EventModel.find(query);
 }
 
+export const getAllTags = async () => {
+    const allEvents = await EventModel.find();
+    const allTagsSet = new Set();
+    allEvents.forEach(eventFound => {
+        const currentTags = eventFound.tags;
+        currentTags.forEach(tag => {
+            allTagsSet.add(tag);
+        });
+    });
+    return [...allTagsSet];
+}
+
+
 // fetch all currently used tags from DB

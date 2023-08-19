@@ -50,6 +50,21 @@ async function getCoordinates(address) {
 //     hostName: eventsDao.getEventsByHostName
 // }
 
+// Get all tags used previously by users
+eventsController.get('/events/tags', async(req, res) => {
+    try {
+        console.log("------------------------------------------------------------------------");
+        console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
+        const tags = await eventsDao.getAllTags();
+        res.status(201).json({tags: tags});
+        console.log(`[${dayjs().toISOString()}] Outgoing Response: Status: ${201}, JSON: ${tags}`);
+    } catch (error) {
+        res.status(400).json({message: error.message});
+        console.log(`[${dayjs().toISOString()}] Outgoing Response: Status: ${400}, JSON: ${res.json}`);
+    }
+    console.log("------------------------------------------------------------------------");
+})
+
 // Find the event
 eventsController.get('/events', async(req, res) => {
     try {
@@ -99,7 +114,6 @@ eventsController.get('/events', async(req, res) => {
 
         
     } catch (error) {
-        console.log(error);
         res.status(400).json({message: error.message});
         console.log(`[${dayjs().toISOString()}] Outgoing Response: Status: ${res.status}, JSON: ${res.json}`);
     }
