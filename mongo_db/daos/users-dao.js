@@ -62,7 +62,6 @@ export const findUserByCredentials = (username, password) =>{
 
 //find organization by Organization details
 export const findUsersByOrgDetails = (orgId,orgName) =>{
-    console.log('hi')
     return OrgUserModel.find({'orgData.orgId':orgId, 'orgData.orgName':orgName})
 }
 

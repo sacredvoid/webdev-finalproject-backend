@@ -57,7 +57,7 @@ const uploadMultipleF = (req, res) => {
             return res.status(200).json({public_url: urls});
         }
     } catch (error) {
-        console.log(error);
+        console.log("in file-controller.js",error.message);
         return res.status(500).json({"File upload": error.message});
     }
 }

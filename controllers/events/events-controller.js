@@ -4,7 +4,7 @@ import getLatLon from "../../utils/geocoding.js";
 
 const eventsController = Router();
 import eventFormReq from "./events-req.json" assert { type: "json" };
-import EventModel from "../../mongo_db/models/event-models/event-model.js";
+import dayjs from "dayjs";
 
 function mapReqToSchema(request) {
     eventFormReq.address = request.address;
@@ -17,68 +17,101 @@ function mapReqToSchema(request) {
     eventFormReq.endDate = request.endDateAndTimeString;
     eventFormReq.tags = request.tags;
     eventFormReq.imgs = request.uploadLinks;
-    eventFormReq.published = request.publish
+    eventFormReq.published = request.publish;
+    eventFormReq.hostDetails = request.hostDetails;
     return eventFormReq;
 }
 
 async function getCoordinates(address) {
-    console.log(address);
-    const addressJson = JSON.parse(address);
-    console.log("is json: ", addressJson)
-    let addressSplit = Object.keys(addressJson).slice(0,-1);
-    console.log(addressSplit);
+    // const addressJson = JSON.parse(address);
     try {
-        let coords = await getLatLon(...addressSplit);
+        let coords = await getLatLon(
+            address.venueName, 
+            address.street, 
+            address.city, 
+            address.state, 
+            address.country
+        );
         return coords;
     } catch (error) {
+        console.log(error);
         return [0,0];
     }
 }
 
 // Method mapping depending on what's found in the body:
-const findMethodsMapping = {
-    _id: eventsDao.getEventById,
-    keyword: eventsDao.getEventsByKeyword,
-    location: eventsDao.getEventsByLocation,
-    tags: eventsDao.getEventsByTags,
-    startDate: eventsDao.getEventsOnOrAfterStartDate,
-    hostName: eventsDao.getEventsByHostName
-}
+// No Longer required
+// const findMethodsMapping = {
+//     _id: eventsDao.getEventById,
+//     keyword: eventsDao.getEventsByKeyword,
+//     location: eventsDao.getEventsByLocation,
+//     tags: eventsDao.getEventsByTags,
+//     startDate: eventsDao.getEventsOnOrAfterStartDate,
+//     hostName: eventsDao.getEventsByHostName
+// }
 
 // Find the event
 eventsController.get('/events', async(req, res) => {
     try {
-        // if (req.body.hasOwnProperty('_id')) {
-        //     const eventFound = await eventsDao.getEventById(req.body._id);
-        //     res.status(201).json(eventFound);
-        // }
+        console.log("------------------------------------------------------------------------");
+        console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
+        if (req.body.hasOwnProperty('_id')) {
+            const eventFound = await eventsDao.getEventById(req.body._id);
+            res.status(201).json(eventFound);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${JSON.stringify(eventFound)}`);
+            console.log("------------------------------------------------------------------------");
+            return;
+        }
         // // if body contains any other element
         // else if (req.body.hasOwnProperty()) {}
         // else {
         //     const allEvents = await eventsDao.getAllEvents();
         //     res.status(201).json(allEvents);
         // }
-        for(const searchParameter in findMethodsMapping) {
-            if(req.body.hasOwnProperty(searchParameter)) {
-                const method = findMethodsMapping[searchParameter];
-                const results = await method(req.body[searchParameter]);
-                res.status(201).json(results);
-                return;
-            }
+        // for(const searchParameter in findMethodsMapping) {
+        //     if(req.body.hasOwnProperty(searchParameter)) {
+        //         const method = findMethodsMapping[searchParameter];
+        //         const results = await method(req.body[searchParameter]);
+        //         console.log("SEARCH RESULTS: $$$$", results);
+        //         res.status(201).json(results);
+        //         return;
+        //     }
             
+        // }
+        const query_params = ['keyword', 'postalCode','startDateTime', 'endDateTime', 'tags'];
+        const final_search_query = {};
+        query_params.forEach(query => {
+            if(req.body.hasOwnProperty(query) && req.body[query]!== '') {
+                final_search_query[query] = req.body[query];
+            }
+        });
+        if (final_search_query !== {}) {
+            const results = await eventsDao.getEventsCustomSearch(final_search_query);
+            res.status(201).json(results);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${results}`);
         }
-        const allEvents = await eventsDao.getAllEvents();
-        res.status(201).json(allEvents);
+        else {
+            const allEvents = await eventsDao.getAllEvents();
+            res.status(201).json(allEvents);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response: Status: ${201}, JSON: ${allEvents}`);
+        }
+        
+
+        
     } catch (error) {
         console.log(error);
         res.status(400).json({message: error.message});
+        console.log(`[${dayjs().toISOString()}] Outgoing Response: Status: ${res.status}, JSON: ${res.json}`);
     }
+    console.log("------------------------------------------------------------------------");
         
 })
 
 
 // Create new event
 eventsController.post('/events', async(req, res) => {
+    console.log("------------------------------------------------------------------------");
+    console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
     const eventFormDetails = req.body;
     // Call external api here for co-ordinates
     let address = eventFormDetails.address
@@ -91,14 +124,19 @@ eventsController.post('/events', async(req, res) => {
     try {
         eventCreated = await eventsDao.createEvent(updatedEventFormDetails);
         res.status(201).json(eventCreated);
+        console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${eventCreated}`);
     } catch (error) {
         console.log(error);
         res.status(400).json({message: error.message});
+        console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
     }
+    console.log("------------------------------------------------------------------------");
 })
 
 // Update the event
 eventsController.put('/events', async(req, res) => {
+    console.log("------------------------------------------------------------------------");
+    console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
     let newFormDetails = req.body;
     // console.log("in controller: ", newFormDetails);
     let eventEdited = null;
@@ -109,34 +147,44 @@ eventsController.put('/events', async(req, res) => {
             newFormDetails['coordinates'] = await getCoordinates(newFormDetails.address);
         }
         try {
-            console.log(newFormDetails)
             eventEdited = await eventsDao.updateEvent(id, newFormDetails);
             res.status(201).json(eventEdited);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${JSON.stringify(eventEdited)}`);
+
         } catch(error) {
             console.log(error);
             res.status(400).json({message: error.message})
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
+
         }
     }
     else {
         res.status(404).json({message: 'Missing event ID'})
     }
+    console.log("------------------------------------------------------------------------");
+
 })
 
 // Delete the event
 eventsController.delete('/events', async(req, res) => {
+    console.log("------------------------------------------------------------------------");
+    console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
     let eventDeleted = null;
     if (req.body.hasOwnProperty('_id')) {
         try {
             eventDeleted = await eventsDao.deleteEvent(req.body._id);
             res.status(201).json(eventDeleted);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${JSON.stringify(eventDeleted)}`);
         } catch(error) {
             console.log(error);
             res.status(400).json({message: error.message})
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
         }
     }
     else {
         res.status(404).json({message: 'Missing event ID'})
     }
+    console.log("------------------------------------------------------------------------");
 })
 
 export default eventsController;

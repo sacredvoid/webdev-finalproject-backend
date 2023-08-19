@@ -1,4 +1,5 @@
 import EventModel from "../models/event-models/event-model.js";
+import dayjs from "dayjs";
 
 export const createEvent = (eventData) => {
     return EventModel.create(eventData);
@@ -21,47 +22,51 @@ export const getEventById = (id) => {
 }
 
 export const getEventsByKeyword = (keyword) => {
-    EventModel.find({$text: {$search: keyword}}, (err, events) => {
-        if(err) {
-            return null;
-        }
-        else {
-            return events;
-        }
-    });
-}
-
-export const getEventsByLocation = (location) => {
-
+    return EventModel.find({$text: {$search: keyword}});
 }
 
 export const getEventsByTags = (tags) => {
-    EventModel.find({ tags: { $all: tags } }, (err, events) => {
-        if (err) {
-          return null;
-        } else {
-          return events;
-        }
-      });
+    return EventModel.find({ tags: { $all: tags } });
 }
 
 export const getEventsOnOrAfterStartDate = (startDate) => {
     const startDateObj = dayjs(startDate);
-    EventModel.find({ date: { $gte: startDateObj.toString() } }, (err, events) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Events after the specified date:', events);
-        }
-      });
+    return EventModel.find({ date: { $gte: startDateObj.toString() } });
 }
 
-export const getEventsByHostName = (hostName) => {
-    EventModel.find({ 'hostDetails.name': hostName }, (err, events) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log('Matching events:', events);
-        }
-      });
+export const getEventsCustomSearch = (queryObject) => {
+    const keyword = queryObject.keyword; 
+    const postalCode = queryObject.postalCode; 
+    const startDateTime = queryObject.startDateTime; 
+    const endDateTime = queryObject.endDateTime;
+    const tags = queryObject.tags; 
+
+    const query = {};
+
+    if (keyword) {
+    // Search for keyword in eventName and description fields using text search
+    query.$text = { $search: keyword };
+    }
+
+    if (postalCode) {
+    // Search for events with matching postalCode
+    query['address.zipcode'] = postalCode;
+    }
+
+    if (startDateTime) {
+    // Search for events within a date range
+    query.startDate = { $gte: startDateTime };
+    }
+
+    if(endDateTime) {
+        query.endDate = { $lte: endDateTime };
+    }
+
+    if (tags) {
+    // Search for events with matching tags
+    query.tags = { $in: tags}; // Assuming tags are provided as a comma-separated string
+    }
+    return EventModel.find(query);
 }
+
+// fetch all currently used tags from DB

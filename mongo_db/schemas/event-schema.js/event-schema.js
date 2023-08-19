@@ -4,11 +4,13 @@ import mongoose from "mongoose";
 const HostnameSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        default: ''
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        default: ''
     },
   });
 
@@ -94,14 +96,15 @@ export const eventSchema = new mongoose.Schema({
 
 eventSchema.index(
     {
-      eventName: 'text',
-      description: 'text',
-      tags: 'text',
-      'address.venueName': 'text',
-      'address.street': 'text',
-      'address.city': 'text',
-      'address.state': 'text',
-      'address.country': 'text',
-      'address.zipcode': 'text'
+      eventName: "text",
+      description: "text",
+      tags:"text",
+      'address.venueName':"text",
+      'address.street': "text",
+      'address.city': "text",
+      'address.state': "text",
+      'address.country': "text",
+      'address.zipcode': "text"
+      // add hostname
     }
   );
