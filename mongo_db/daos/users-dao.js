@@ -4,7 +4,12 @@ import  GuestUserModel  from "../models/user-models/guest-user-model.js";
 import OrgUserModel from "../models/user-models/organization-user-model.js";
 import RegUserModel from "../models/user-models/reg-user-model.js";
 
-
+const userTypeMap = {
+    "regular": RegUserModel,
+    "organization": OrgUserModel,
+    "guest": GuestUserModel,
+    "admin": AdminUserModel,
+}
 //create a GuestUser
 export const createGuest = (user) =>{
     return GuestUserModel.create(user)
@@ -69,7 +74,7 @@ export const findUsersByOrgDetails = (orgId,orgName) =>{
 
 //updat a user information
 export const updateUser = (id, user)=>{
-    return BaseUserModel.updateOne({_id : id}, {$set: user})
+    return userTypeMap[user.user_type].updateOne({_id : id}, {$set: user})
 }
 
 //delete a user

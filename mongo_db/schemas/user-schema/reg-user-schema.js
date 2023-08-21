@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { EventSourceSchema } from "../event-source-schema.js";
 export const RegUserSchema = new mongoose.Schema({
     username:{
         type: String,
@@ -13,7 +14,11 @@ export const RegUserSchema = new mongoose.Schema({
         default: ['view','create','attend'],
     },
     createdEventIds:{ type: Array, default: []},
-    goingEventIds:{ type: Array, default: []},
+    goingEventIds : {
+        type:[EventSourceSchema],
+        default: []
+    },
+
     friendList:{
         friend_name: String,
         user_id: String,
