@@ -46,4 +46,19 @@ authController.post('/register', async(req,res) => {
 
 })
 
+authController.post('/profile', (req,res) => {
+    const currentUser = req.session['currentUser'];
+    if(currentUser){
+        res.json(currentUser);
+    } else{
+        res.sendStatus(403);
+    }
+})
+
+authController.post('/logout', (req,res) => {
+    req.session.destroy();
+    res.sendStatus(200);
+})
+
 export default authController;
+

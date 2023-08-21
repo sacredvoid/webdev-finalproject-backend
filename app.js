@@ -13,25 +13,27 @@ const PORT = 4000
 connectDB()
 const app = express();
 app.use(cors({
-    origin: [process.env.FRONTEND_DEV_URL],
+    //origin: [process.env.FRONTEND_DEV_URL],
+    origin:"http://localhost:3000",
     credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+
 
 const sessionOptions = {
     secret: "any string",
     resave: false,
     saveUninitialized: false,
 };
-if (process.env.NODE_ENV !== "development") {
-    sessionOptions.proxy = true;
-    sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-    };
-}
+// if (process.env.NODE_ENV !== "development") {
+//     sessionOptions.proxy = true;
+//     sessionOptions.cookie = {
+//     sameSite: "none",
+//     secure: true,
+//     };
+// }
 app.use(session(sessionOptions))
+app.use(express.json());
 fileController(app);
 app.get('/api', (req, res) => {res.send('Welcome to Full Stack Development!')})
 app.use('/api',  userController)

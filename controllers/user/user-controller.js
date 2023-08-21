@@ -68,8 +68,8 @@ userController.get("/users", async (req,res) =>{
 })
 
 // delete users
-userController.delete('/users/:id',async (req,res)=>{
-    const id = req.params.id;
+userController.delete('/users/:_id',async (req,res)=>{
+    const id = req.params._id;
     try{
         const status = await deleteUser(id);
         res.status(200).json(status);
@@ -79,10 +79,10 @@ userController.delete('/users/:id',async (req,res)=>{
     
 })
 
-//udate user
-userController.put('/users/:id', async (req,res) => {
+//update user
+userController.put('/users/:_id', async (req,res) => {
     try{
-        const id = req.params.id;
+        const id = req.params._id;
         const status = await updateUser(id,req.body);
         // const updated_user = await findUserById(id)
         res.json(status)
@@ -90,4 +90,4 @@ userController.put('/users/:id', async (req,res) => {
         res.status(500).json({message: err.message})
     }
 })
-export default userController
+export default userController;
