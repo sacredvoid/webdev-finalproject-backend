@@ -6,11 +6,11 @@ export const createEvent = (eventData) => {
 }
 
 export const updateEvent = (id, eventData) => {
-    return EventModel.updateOne({_id: id}, {$set: eventData})
+    return EventModel.updateOne({ _id: id }, { $set: eventData })
 }
 
 export const deleteEvent = (id) => {
-    return EventModel.deleteOne({_id: id});
+    return EventModel.deleteOne({ _id: id });
 }
 
 export const getAllEvents = () => {
@@ -22,7 +22,7 @@ export const getEventById = (id) => {
 }
 
 export const getEventsByKeyword = (keyword) => {
-    return EventModel.find({$text: {$search: keyword}});
+    return EventModel.find({ $text: { $search: keyword } });
 }
 
 export const getEventsByTags = (tags) => {
@@ -35,37 +35,46 @@ export const getEventsOnOrAfterStartDate = (startDate) => {
 }
 
 export const getEventsCustomSearch = (queryObject) => {
-    const keyword = queryObject.keyword; 
-    const postalCode = queryObject.postalCode; 
-    const startDateTime = queryObject.startDateTime; 
+    const keyword = queryObject.keyword;
+    const postalCode = queryObject.postalCode;
+    const startDateTime = queryObject.startDateTime;
     const endDateTime = queryObject.endDateTime;
-    const tags = queryObject.tags; 
+    const tags = queryObject.tags;
 
     const query = {};
 
     if (keyword) {
-    // Search for keyword in eventName and description fields using text search
-    query.$text = { $search: keyword };
+        // Search for keyword in eventName and description fields using text search
+        query.$text = { $search: keyword };
     }
 
     if (postalCode) {
-    // Search for events with matching postalCode
-    query['address.zipcode'] = postalCode;
+        // Search for events with matching postalCode
+        query['address.zipcode'] = postalCode;
     }
 
     if (startDateTime) {
-    // Search for events within a date range
-    query.startDate = { $gte: startDateTime };
+        // Search for events within a date range
+        if (query.startDate) {
+            query.startDate.$gte = startDateTime;
+        } else {
+            query.startDate = { $gte: startDateTime };
+        }
     }
 
-    if(endDateTime) {
-        query.endDate = { $lte: endDateTime };
+    if (endDateTime) {
+        if (query.startDate) {
+            query.startDate.$lte = endDateTime;
+        } else {
+            query.startDate = { $lte: endDateTime };
+        }
     }
 
     if (tags) {
-    // Search for events with matching tags
-    query.tags = { $in: tags}; // Assuming tags are provided as a comma-separated string
+        // Search for events with matching tags
+        query.tags = { $in: tags }; // Assuming tags are provided as a comma-separated string
     }
+    console.log('query:', query)
     return EventModel.find(query);
 }
 

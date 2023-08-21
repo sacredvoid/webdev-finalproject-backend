@@ -69,9 +69,9 @@ eventsController.get('/events/tags', async(req, res) => {
 eventsController.get('/events', async(req, res) => {
     try {
         console.log("------------------------------------------------------------------------");
-        console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
-        if (req.body.hasOwnProperty('_id')) {
-            const eventFound = await eventsDao.getEventById(req.body._id);
+        console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.query)}`);
+        if (req.query.hasOwnProperty('_id')) {
+            const eventFound = await eventsDao.getEventById(req.query._id);
             res.status(201).json(eventFound);
             console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${JSON.stringify(eventFound)}`);
             console.log("------------------------------------------------------------------------");
@@ -95,9 +95,9 @@ eventsController.get('/events', async(req, res) => {
         // }
         const query_params = ['keyword', 'postalCode','startDateTime', 'endDateTime', 'tags'];
         const final_search_query = {};
-        query_params.forEach(query => {
-            if(req.body.hasOwnProperty(query) && req.body[query]!== '') {
-                final_search_query[query] = req.body[query];
+        query_params.forEach(param => {
+            if(req.query.hasOwnProperty(param) && req.query[param]!== '') {
+                final_search_query[param] = req.query[param];
             }
         });
         if (final_search_query !== {}) {
