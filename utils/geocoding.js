@@ -8,23 +8,40 @@ country (string) = address country, default: empty string
 Return:
 coords (array of strings) = latitude and longitude
 */
-async function getLatLon(street='', city='', state='', country='') {
+async function getLatLon(venue='',street='', city='', state='', country='') {
     // format params: + sign separated, no whitespace
-    const searchParams = `${street}+${city}+${state}+${country}`.replace(/ /g, '+');
+    const parts = [];
+
+    if (venue) {
+        parts.push(venue);
+    }
+    else {
+        if (street) parts.push(street);
+    }
+    if (city) parts.push(city);
+    if (state) parts.push(state);
+    if (country) parts.push(country);
+
+    const searchParams = parts.join('+').replace(/ /g, '+');
     // nominatim api url with search params
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchParams}`;
-    console.log(url);
+    // console.log(url);
     // retrieve json results from url
-    const results = await getJSON(url);
-    // take first item in json, which is the top result; assumes that the top result in the right one
-    const topRes = results[0];
-    // extract latitude and longitude from results
-    const lat = topRes.lat;
-    const lon = topRes.lon;
-    // format lat and lon as list and return
-    const coords = [lat, lon];
-    console.log(coords)
-    return coords;
+    try {
+        const results = await getJSON(url);
+        // take first item in json, which is the top result; assumes that the top result in the right one
+        const topRes = results[0];
+        // extract latitude and longitude from results
+        const lat = topRes.lat;
+        const lon = topRes.lon;
+        // format lat and lon as list and return
+        const coords = [lat, lon];
+        // console.log(coords)
+        return coords;
+    } catch (error) {
+        console.log(`in geocoding.js : ${error.message}`);
+        return [0,0];
+    }
 }
 
 /*

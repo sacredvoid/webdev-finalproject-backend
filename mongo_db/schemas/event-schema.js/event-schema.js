@@ -1,6 +1,47 @@
 import { Decimal128 } from "mongodb";
 import mongoose from "mongoose";
-const eventSchema = new mongoose.Schema({
+
+const HostnameSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        default: ''
+    },
+    email: {
+        type: String,
+        required: true,
+        default: ''
+    },
+  });
+
+const AddressSchema = new mongoose.Schema({
+    venueName: {
+        type: String,
+        required: true
+    },
+    street: {
+        type: String,
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
+    state: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    zipcode: {
+        type: String,
+        required: true
+    }
+})
+
+export const eventSchema = new mongoose.Schema({
     eventName: {
         type: String,
         required: true,
@@ -14,10 +55,7 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    address: {
-        type: String,
-        required: true
-    },
+    address: AddressSchema,
     coordinates: {
         type: [Decimal128],
         required: true,
@@ -27,6 +65,11 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: ''
+    },
+    published: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     reservation: {
         type: Boolean,
@@ -47,9 +90,21 @@ const eventSchema = new mongoose.Schema({
         type: [String],
         required: false,
         default: []
+    },
+    hostDetails: HostnameSchema
+}, {collection: "events"})
+
+eventSchema.index(
+    {
+      eventName: "text",
+      description: "text",
+      tags:"text",
+      'address.venueName':"text",
+      'address.street': "text",
+      'address.city': "text",
+      'address.state': "text",
+      'address.country': "text",
+      'address.zipcode': "text"
+      // add hostname
     }
-}, "events")
-
-const eventModel = mongoose.model('Event', eventSchema)
-
-export default eventModel
+  );
