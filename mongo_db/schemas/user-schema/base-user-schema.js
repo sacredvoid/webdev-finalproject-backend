@@ -5,6 +5,7 @@ export const BaseUserSchema =  new Schema({
     lastname:{type:String, required:true},
     privileges:{type:Array, default:['view']},
     tags:[String],
+    email:String,
     address:{
         addressLine1:String,
         addressLine2:String,
