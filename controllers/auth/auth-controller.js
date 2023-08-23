@@ -4,27 +4,28 @@ import { createOrganizaitonUser, createRegular, findUserByCredentials, findUserB
 const authController = Router();
 
 authController.post('/login', async(req,res)=>{
-    console.log('in server auth controller')
     const username = req.body.username;
     const password = req.body.password;
     const user = await findUserByCredentials(username, password);
-    console.log('in login ', user)
+    const state_object = {
+        details : user,
+        loggedIn : true
+    }
     if (user){
-        req.session['currentUser'] = user;
-        res.json(user);
+        req.session['currentUser'] = state_object;
+        res.json(state_object);
     } else{
         res.sendStatus(404);
     }
 });
 
 authController.post('/register', async(req,res) => {
-    console.log('in authcontroller')
-    console.log(req.body)
     const formType = req.body.form_type;
     const formData = req.body.formData;
     const username = formData.username;
     let newUser = null;
     const user = await findUserByUsername(username);
+    
     try{
         if(user){
             res.sendStatus(403);
@@ -36,14 +37,33 @@ authController.post('/register', async(req,res) => {
         else if (formType === "org-user"){
             newUser = await createOrganizaitonUser(formData)
         }
-        req.session["currentUser"] = newUser;
-        res.json(newUser);
+        const state_object = {
+            details : newUser,
+            loggedIn : true
+        }
+        req.session["currentUser"] = state_object;
+        res.json(state_object);
         
     }catch(error){
         res.status(500).json(error)
     }
     
 
+})
+
+authController.post('/profile', (req, res) => {
+    const currentUser = req.session["currentUser"];
+    console.log(currentUser)
+    if (!currentUser) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(currentUser);
+});
+
+authController.post('/logout', (req,res) => {
+    req.session.destroy();
+    res.sendStatus(200);
 })
 
 export default authController;
