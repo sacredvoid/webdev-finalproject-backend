@@ -15,6 +15,7 @@ const uploadFile = (req, res) => {
             return res.status(400).json({error:'File upload failed'});
         }
         else {
+            console.log("$$$$$$$$$$$$$$$$$",req.file.publicUrl);
             return res.status(200).json({public_url: req.file.publicUrl});
         }
     } catch (error) {

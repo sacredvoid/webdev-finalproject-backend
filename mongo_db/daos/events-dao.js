@@ -1,5 +1,6 @@
 import EventModel from "../models/event-models/event-model.js";
 import dayjs from "dayjs";
+import RegUserModel from "../models/user-models/reg-user-model.js";
 
 export const createEvent = (eventData) => {
     return EventModel.create(eventData);
@@ -90,5 +91,42 @@ export const getAllTags = async () => {
     return [...allTagsSet];
 }
 
+function countItems(arr) {
+  const counts = new Map();
+  
+  for (const item of arr) {
+    counts.set(item, (counts.get(item) || 0) + 1);
+  }
+  
+  return counts;
+}
+
+function getTopItems(itemCounts) {
+  // Convert the Map or object to an array of key-value pairs
+  const itemCountArray = Array.from(itemCounts);
+
+  // Sort the array in descending order based on item counts
+  itemCountArray.sort((a, b) => b[1] - a[1]);
+
+  // Slice the first 10 items or fewer
+  const topItems = itemCountArray.slice(0, 10);
+
+  // Convert the result back to an object if needed
+  const topItemsObject = Object.fromEntries(topItems);
+
+  return topItemsObject;
+}
+
+// Get top 10 events
+export const getTop10Events = async() => {
+    const allRegUsers = await RegUserModel.find();
+    let allGoingEvents = []
+    allRegUsers.forEach(user => {
+        allGoingEvents.push(user.goingEventIds);
+    });
+    const goingEventCount = countItems(allGoingEvents);
+    return getTopItems(goingEventCount);
+}
+// Get users recently liked
 
 // fetch all currently used tags from DB

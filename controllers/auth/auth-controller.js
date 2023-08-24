@@ -51,14 +51,23 @@ authController.post('/register', async(req,res) => {
 
 })
 
-authController.post('/profile', (req, res) => {
+authController.post('/profile', async(req, res) => {
     const currentUser = req.session["currentUser"];
     console.log(currentUser)
     if (!currentUser) {
         res.sendStatus(404);
         return;
     }
-    res.json(currentUser);
+    
+    const currentUsername = currentUser.details.username;
+    const currentPassword = currentUser.details.password;
+    const userFetched = await findUserByCredentials(currentUsername, currentPassword)
+
+    const returningUser = {
+        details: userFetched,
+        loggedIn: currentUser.loggedIn
+    } 
+    res.json(returningUser);
 });
 
 authController.post('/logout', (req,res) => {
