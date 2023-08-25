@@ -17,8 +17,11 @@ function mapReqToSchema(request) {
     eventFormReq.endDate = request.endDateAndTimeString;
     eventFormReq.tags = request.tags;
     eventFormReq.imgs = request.uploadLinks;
-    eventFormReq.published = request.publish;
+    eventFormReq.published = request.shouldPublish;
     eventFormReq.hostDetails = request.hostDetails;
+    if(request.hasOwnProperty('_id')) {
+        eventFormReq._id = request._id
+    }
     return eventFormReq;
 }
 
@@ -147,7 +150,7 @@ eventsController.post('/events', async(req, res) => {
     
     // Update incoming request and send to DB for saving
     const updatedEventFormDetails = mapReqToSchema(eventFormDetails)
-    console.log(updatedEventFormDetails);
+    // console.log(updatedEventFormDetails);
     let eventCreated = null;
     try {
         eventCreated = await eventsDao.createEvent(updatedEventFormDetails);
@@ -156,7 +159,7 @@ eventsController.post('/events', async(req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({message: error.message});
-        console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
+        console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${400}, JSON: ${error.message}`);
     }
     console.log("------------------------------------------------------------------------");
 })
@@ -167,6 +170,8 @@ eventsController.put('/events', async(req, res) => {
     console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
     let newFormDetails = req.body;
     // console.log("in controller: ", newFormDetails);
+    newFormDetails = mapReqToSchema(newFormDetails);
+    console.log("NEW FORM DEETS", newFormDetails);
     let eventEdited = null;
     if (newFormDetails.hasOwnProperty('_id')) {
         const id = newFormDetails._id;
@@ -182,7 +187,7 @@ eventsController.put('/events', async(req, res) => {
         } catch(error) {
             console.log(error);
             res.status(400).json({message: error.message})
-            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${400}, JSON: ${error.message}`);
 
         }
     }
@@ -194,19 +199,19 @@ eventsController.put('/events', async(req, res) => {
 })
 
 // Delete the event
-eventsController.delete('/events', async(req, res) => {
+eventsController.delete('/events/:eventID', async(req, res) => {
     console.log("------------------------------------------------------------------------");
     console.log(`[${dayjs().toISOString()}] - ${req.method}:${req.originalUrl} - Incoming Request: ${JSON.stringify(req.body)}`);
     let eventDeleted = null;
-    if (req.body.hasOwnProperty('_id')) {
+    if (req.params.eventID) {
         try {
-            eventDeleted = await eventsDao.deleteEvent(req.body._id);
+            eventDeleted = await eventsDao.deleteEvent(req.params.eventID);
             res.status(201).json(eventDeleted);
             console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${JSON.stringify(eventDeleted)}`);
         } catch(error) {
             console.log(error);
             res.status(400).json({message: error.message})
-            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${201}, JSON: ${error.message}`);
+            console.log(`[${dayjs().toISOString()}] Outgoing Response:Status: ${400}, JSON: ${error.message}`);
         }
     }
     else {
