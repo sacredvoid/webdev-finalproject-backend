@@ -53,7 +53,6 @@ authController.post('/register', async(req,res) => {
 
 authController.post('/profile', async(req, res) => {
     const currentUser = req.session["currentUser"];
-    console.log(currentUser)
     if (!currentUser) {
         res.sendStatus(404);
         return;
